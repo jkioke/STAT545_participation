@@ -109,15 +109,27 @@ flights2
 
 ```{r}
 # Which join function to use?
-
+summary(airlines)
+airlines
+left_join(flights2, airlines, by = "carrier")
 ```
 
 ### 4. Add `weather` information to the `flights2` dataset by matching "year" and "time_hour" variables.
+```{r}
+summary(weather)
+
+flights2 %>% 
+  left_join(weather, by = c("year", "time_hour"))
+```
 
 
 
 ### 5. Add `weather` information to the `flights2` dataset by matching only "time_hour" variable
 
+```{r}
+flights2 %>% 
+  left_join(weather, by = "time_hour")
+```
 
 
 ## Types of filtering join

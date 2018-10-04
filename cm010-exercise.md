@@ -225,11 +225,141 @@ flights2
 
 ``` r
 # Which join function to use?
+summary(airlines)
 ```
+
+    ##    carrier              name          
+    ##  Length:16          Length:16         
+    ##  Class :character   Class :character  
+    ##  Mode  :character   Mode  :character
+
+``` r
+airlines
+```
+
+    ## # A tibble: 16 x 2
+    ##    carrier name                       
+    ##    <chr>   <chr>                      
+    ##  1 9E      Endeavor Air Inc.          
+    ##  2 AA      American Airlines Inc.     
+    ##  3 AS      Alaska Airlines Inc.       
+    ##  4 B6      JetBlue Airways            
+    ##  5 DL      Delta Air Lines Inc.       
+    ##  6 EV      ExpressJet Airlines Inc.   
+    ##  7 F9      Frontier Airlines Inc.     
+    ##  8 FL      AirTran Airways Corporation
+    ##  9 HA      Hawaiian Airlines Inc.     
+    ## 10 MQ      Envoy Air                  
+    ## 11 OO      SkyWest Airlines Inc.      
+    ## 12 UA      United Air Lines Inc.      
+    ## 13 US      US Airways Inc.            
+    ## 14 VX      Virgin America             
+    ## 15 WN      Southwest Airlines Co.     
+    ## 16 YV      Mesa Airlines Inc.
+
+``` r
+left_join(flights2, airlines, by = "carrier")
+```
+
+    ## # A tibble: 1,000 x 5
+    ##     year tailnum carrier time_hour           name                    
+    ##    <int> <chr>   <chr>   <dttm>              <chr>                   
+    ##  1  2013 N14228  UA      2013-01-01 05:00:00 United Air Lines Inc.   
+    ##  2  2013 N24211  UA      2013-01-01 05:00:00 United Air Lines Inc.   
+    ##  3  2013 N619AA  AA      2013-01-01 05:00:00 American Airlines Inc.  
+    ##  4  2013 N804JB  B6      2013-01-01 05:00:00 JetBlue Airways         
+    ##  5  2013 N668DN  DL      2013-01-01 06:00:00 Delta Air Lines Inc.    
+    ##  6  2013 N39463  UA      2013-01-01 05:00:00 United Air Lines Inc.   
+    ##  7  2013 N516JB  B6      2013-01-01 06:00:00 JetBlue Airways         
+    ##  8  2013 N829AS  EV      2013-01-01 06:00:00 ExpressJet Airlines Inc.
+    ##  9  2013 N593JB  B6      2013-01-01 06:00:00 JetBlue Airways         
+    ## 10  2013 N3ALAA  AA      2013-01-01 06:00:00 American Airlines Inc.  
+    ## # ... with 990 more rows
 
 ### 4. Add `weather` information to the `flights2` dataset by matching "year" and "time\_hour" variables.
 
+``` r
+summary(weather)
+```
+
+    ##     origin               year          month             day       
+    ##  Length:26115       Min.   :2013   Min.   : 1.000   Min.   : 1.00  
+    ##  Class :character   1st Qu.:2013   1st Qu.: 4.000   1st Qu.: 8.00  
+    ##  Mode  :character   Median :2013   Median : 7.000   Median :16.00  
+    ##                     Mean   :2013   Mean   : 6.504   Mean   :15.68  
+    ##                     3rd Qu.:2013   3rd Qu.: 9.000   3rd Qu.:23.00  
+    ##                     Max.   :2013   Max.   :12.000   Max.   :31.00  
+    ##                                                                    
+    ##       hour            temp             dewp           humid       
+    ##  Min.   : 0.00   Min.   : 10.94   Min.   :-9.94   Min.   : 12.74  
+    ##  1st Qu.: 6.00   1st Qu.: 39.92   1st Qu.:26.06   1st Qu.: 47.05  
+    ##  Median :11.00   Median : 55.40   Median :42.08   Median : 61.79  
+    ##  Mean   :11.49   Mean   : 55.26   Mean   :41.44   Mean   : 62.53  
+    ##  3rd Qu.:17.00   3rd Qu.: 69.98   3rd Qu.:57.92   3rd Qu.: 78.79  
+    ##  Max.   :23.00   Max.   :100.04   Max.   :78.08   Max.   :100.00  
+    ##                  NA's   :1        NA's   :1       NA's   :1       
+    ##     wind_dir       wind_speed         wind_gust         precip        
+    ##  Min.   :  0.0   Min.   :   0.000   Min.   :16.11   Min.   :0.000000  
+    ##  1st Qu.:120.0   1st Qu.:   6.905   1st Qu.:20.71   1st Qu.:0.000000  
+    ##  Median :220.0   Median :  10.357   Median :24.17   Median :0.000000  
+    ##  Mean   :199.8   Mean   :  10.518   Mean   :25.49   Mean   :0.004469  
+    ##  3rd Qu.:290.0   3rd Qu.:  13.809   3rd Qu.:28.77   3rd Qu.:0.000000  
+    ##  Max.   :360.0   Max.   :1048.361   Max.   :66.75   Max.   :1.210000  
+    ##  NA's   :460     NA's   :4          NA's   :20778                     
+    ##     pressure          visib          time_hour                  
+    ##  Min.   : 983.8   Min.   : 0.000   Min.   :2013-01-01 01:00:00  
+    ##  1st Qu.:1012.9   1st Qu.:10.000   1st Qu.:2013-04-01 21:30:00  
+    ##  Median :1017.6   Median :10.000   Median :2013-07-01 14:00:00  
+    ##  Mean   :1017.9   Mean   : 9.255   Mean   :2013-07-01 18:26:37  
+    ##  3rd Qu.:1023.0   3rd Qu.:10.000   3rd Qu.:2013-09-30 13:00:00  
+    ##  Max.   :1042.1   Max.   :10.000   Max.   :2013-12-30 18:00:00  
+    ##  NA's   :2729
+
+``` r
+flights2 %>% 
+  left_join(weather, by = c("year", "time_hour"))
+```
+
+    ## # A tibble: 2,888 x 17
+    ##     year tailnum carrier time_hour           origin month   day  hour
+    ##    <dbl> <chr>   <chr>   <dttm>              <chr>  <dbl> <int> <int>
+    ##  1 2013. N14228  UA      2013-01-01 05:00:00 EWR       1.     1     5
+    ##  2 2013. N14228  UA      2013-01-01 05:00:00 JFK       1.     1     5
+    ##  3 2013. N14228  UA      2013-01-01 05:00:00 LGA       1.     1     5
+    ##  4 2013. N24211  UA      2013-01-01 05:00:00 EWR       1.     1     5
+    ##  5 2013. N24211  UA      2013-01-01 05:00:00 JFK       1.     1     5
+    ##  6 2013. N24211  UA      2013-01-01 05:00:00 LGA       1.     1     5
+    ##  7 2013. N619AA  AA      2013-01-01 05:00:00 EWR       1.     1     5
+    ##  8 2013. N619AA  AA      2013-01-01 05:00:00 JFK       1.     1     5
+    ##  9 2013. N619AA  AA      2013-01-01 05:00:00 LGA       1.     1     5
+    ## 10 2013. N804JB  B6      2013-01-01 05:00:00 EWR       1.     1     5
+    ## # ... with 2,878 more rows, and 9 more variables: temp <dbl>, dewp <dbl>,
+    ## #   humid <dbl>, wind_dir <dbl>, wind_speed <dbl>, wind_gust <dbl>,
+    ## #   precip <dbl>, pressure <dbl>, visib <dbl>
+
 ### 5. Add `weather` information to the `flights2` dataset by matching only "time\_hour" variable
+
+``` r
+flights2 %>% 
+  left_join(weather, by = "time_hour")
+```
+
+    ## # A tibble: 2,888 x 18
+    ##    year.x tailnum carrier time_hour           origin year.y month   day
+    ##     <int> <chr>   <chr>   <dttm>              <chr>   <dbl> <dbl> <int>
+    ##  1   2013 N14228  UA      2013-01-01 05:00:00 EWR     2013.    1.     1
+    ##  2   2013 N14228  UA      2013-01-01 05:00:00 JFK     2013.    1.     1
+    ##  3   2013 N14228  UA      2013-01-01 05:00:00 LGA     2013.    1.     1
+    ##  4   2013 N24211  UA      2013-01-01 05:00:00 EWR     2013.    1.     1
+    ##  5   2013 N24211  UA      2013-01-01 05:00:00 JFK     2013.    1.     1
+    ##  6   2013 N24211  UA      2013-01-01 05:00:00 LGA     2013.    1.     1
+    ##  7   2013 N619AA  AA      2013-01-01 05:00:00 EWR     2013.    1.     1
+    ##  8   2013 N619AA  AA      2013-01-01 05:00:00 JFK     2013.    1.     1
+    ##  9   2013 N619AA  AA      2013-01-01 05:00:00 LGA     2013.    1.     1
+    ## 10   2013 N804JB  B6      2013-01-01 05:00:00 EWR     2013.    1.     1
+    ## # ... with 2,878 more rows, and 10 more variables: hour <int>, temp <dbl>,
+    ## #   dewp <dbl>, humid <dbl>, wind_dir <dbl>, wind_speed <dbl>,
+    ## #   wind_gust <dbl>, precip <dbl>, pressure <dbl>, visib <dbl>
 
 Types of filtering join
 -----------------------
