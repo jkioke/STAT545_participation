@@ -4,6 +4,10 @@ output: github_document
 ---
 
 # Part I
+```{r}
+library(gapminder)
+library(tidyverse)
+```
 
 ## Types and Modes and Classes, Oh My!
 
@@ -35,6 +39,8 @@ Usually, there's no need to fuss about these differences: just use the `is.*()` 
 ```{r}
 is.numeric(a)
 is.data.frame(iris)
+is.numeric(iris)
+is.data.frame(a)
 ```
 
 We can also coerce objects to take on a different form, typically using the `as.*()` family of functions. We can't always coerce! You'll get a sense of this over time, but try:
@@ -45,6 +51,9 @@ We can also coerce objects to take on a different form, typically using the `as.
 
 ```{r}
 as.character(100)
+b <- 100
+print(mode(b))
+print(mode(as.character(100)))
 as.numeric("100") * 2
 #as.numeric("hello")
 as.data.frame(letters)
@@ -62,12 +71,15 @@ We've seen vectors as columns of data frames:
 
 ```{r}
 mtcars$hp
+mtcars %>% 
+  select(hp)
 ```
 
 Use the `c()` function to make a vector consisting of the course code (`"STAT"` and `545`). Notice the coercion. Vectors must be homogeneous.
 
 ```{r}
 (course <- c("STAT", 545))
+(numbers <- c(454, 949))
 ```
 
 
@@ -77,6 +89,7 @@ Subset the first entry. Remove the first entry. Note the base-1 system.
 course[1]
 course[-1]
 sort(course)[1]
+sort(course)[2]
 ```
 
 Use `<-` to change the second entry to "545A". Using the same approach, add a third entry, "S01".
@@ -84,6 +97,7 @@ Use `<-` to change the second entry to "545A". Using the same approach, add a th
 ```{r}
 course[2] <- "545A"
 course[3] <- "S01"
+course[4] <- "BLARG"
 course
 ```
 
@@ -91,6 +105,7 @@ Subset the first and third entry. Order matters! Subset the third and first entr
 
 ```{r}
 course[c(3, 1)]
+?c
 ```
 
 Explore integer sequences, especially negatives and directions. Especially `1:0` that might show up in loops!
@@ -99,8 +114,9 @@ Explore integer sequences, especially negatives and directions. Especially `1:0`
 3:10
 10:-5
 1:0
-# Vector of length 0:
+#Vector of length 0:
 seq_len(0)
+seq_len(1)
 seq_len(10)
 ```
 
@@ -109,6 +125,7 @@ Singletons are also vectors. Check using `is.vector`.
 ```{r}
 is.vector(6)
 a[1][1]
+a[1]
 c("hi", "you")
 "Hi, how are you? Today is the 9th."
 paste("hi", "you")
@@ -132,6 +149,7 @@ Square each component:
 
 ```{r}
 a ^ 2
+n
 ```
 
 Multiply each component by 1 through its length:
@@ -162,6 +180,7 @@ Now try a boolean operator. Note that && and || are NOT vectorized!
 a < 5
 a > 0 & a < 5
 a > 0 && a < 5
+ a > 5 || a < 5
 # Use functions "all" or "any" to reduce a vector of non-1 length.
 any(a > 0 & a < 5)
 all(a > 0 & a < 5)
@@ -200,6 +219,8 @@ course
 2. Using the names function with `<-`. Also, just explore the names function.
 
 ```{r}
+names(course) <- c("subject", "code") #unnamed values are given as "NA"
+(course)
 names(course) <- c("subject", "code", "section")
 course
 names(course)
@@ -220,6 +241,7 @@ course[c("section", "subject")]
 course[["section"]]
 foo <- c(a=5, a=6, b=7)
 foo["a"]
+foo
 ```
 
 Amazingly, we can also subset by a vector of logicals (which will be recycled!). Let's work with our integer sequence vector again:
@@ -238,6 +260,7 @@ Try storing the course code (`"STAT"` and `545`) again, but this time in a list.
 
 ```{r}
 (course <- list("STAT", 545))
+typeof(course)
 ```
 
 
@@ -262,6 +285,9 @@ Try also subsetting by name:
 my_list["year"]
 my_list[["year"]]
 my_list$year
+my_list[[2]][1]
+my_list
+typeof(my_list)
 ```
 
 Smells a little like `data.frame`s. It turns out a `data.frame` is a special type of list:
@@ -278,6 +304,7 @@ is.list(small_df)
 as.list(small_df)
 #Matrix:
 diag(5)
+?diag
 ```
 
 Note that there's a difference between a list of one object, and that object itself! This is different from vectors.
@@ -299,7 +326,7 @@ See what's in the Global Environment by:
 - Looking in RStudio, in the "Environments" pane.
 
 ```{r}
-
+ls()
 ```
 
 
@@ -324,12 +351,14 @@ Let's explore.
     - Install and load the `pryr` package, and use `ls()` to list its bindings (its name is "package:pryr").
 
 ```{r}
-
+install.packages("pryr")
 ```
 
 2. There's a difference between an _environment_ and its _name_. Get the environment with name "package:pryr" using the `as.environment()` function.
 
 ```{r}
+library(pryr)
+sa.environment(pryr)
 
 ```
 
