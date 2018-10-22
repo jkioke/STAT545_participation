@@ -352,13 +352,14 @@ Let's explore.
 
 ```{r}
 install.packages("pryr")
+ls(package:pryr)
 ```
 
 2. There's a difference between an _environment_ and its _name_. Get the environment with name "package:pryr" using the `as.environment()` function.
 
 ```{r}
-library(pryr)
-sa.environment(pryr)
+library("pryr")
+as.environment("package:pryr")
 
 ```
 
@@ -366,14 +367,14 @@ sa.environment(pryr)
 3. Each environment has a parent. Use `parent.env()` to find the parent of the global environment.
 
 ```{r}
-
+parent.env(globalenv())
 ```
 
 
 4. There are packages that come pre-loaded with R, and they're loaded in a sequence called the search path. Use `search()` to identify that path; then see it in RStudio.
 
 ```{r}
-
+search()
 ```
 
 First scoping rule: R looks to the parent environment if it can't find an object where it is.
@@ -381,14 +382,13 @@ First scoping rule: R looks to the parent environment if it can't find an object
 5. Use `pryr::where()` to determine where the first binding to the name `iris` is located.
 
 ```{r}
-
+pryr::where("iris")
 ```
 
 
 6. Override `iris` with, say, a numeric. Now `where()` is it? Can you extract the original?
 
 ```{r}
-
 ```
 
 

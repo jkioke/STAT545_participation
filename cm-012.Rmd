@@ -31,6 +31,8 @@ Examples of Base R's obsession with coercing to factors:
 ```{r}
 data.frame(x=c("A", "B")) %>% 
   str()
+
+data.frame(x=c("A", "B"))
 ```
 
 
@@ -50,8 +52,15 @@ Examples of problems encountered with factors. (ideas came from [R Bloggers](htt
 ```{r}
 head(iris)
 iris %>% 
+  str()
+iris %>% 
   mutate(Species = ifelse(Species == "versicolor", "vers", Species)) %>% 
     str()
+iris %>% 
+  mutate(Species = ifelse(Species == "versicolor", "vers", Species)) %>% 
+    select("Species")
+iris %>% 
+  select("Species")
 ```
 
 ```{r}
@@ -69,6 +78,11 @@ as.character(iris$Species)
 Here is a sample of 10 letters drawn from the possibilities "a", "b", and "c":
 
 ```{r}
+iris$Species %>% 
+  nlevels()
+iris$Species %>% 
+  levels()
+?set.seed
 set.seed(10)
 (draw <- sample(letters[1:3], size = 10, replace = TRUE))
 ```
@@ -91,6 +105,7 @@ We saw that `c()` doesn't work for concatenating. Modify the following code to u
 
 ```{r}
 fct_c(lotr1$Film, lotr2$Film)
+lotr1
 ```
 
 Try binding by row `lotr1` and `lotr2`:
@@ -102,7 +117,14 @@ Which one is more lenient? Which would you prefer?
 
 ```{r}
 rbind(lotr1, lotr2) %>% str()
-bind_rows(lotr1, lotr2) %>% str()
+bind_rows(lotr1, lotr2) %>% str() #bind_rows() coerces Film column to a character vector
+
+
+rbind(lotr1, lotr2) %>%
+  print()
+bind_rows(lotr1, lotr2) %>% 
+  print()
+
 as.character(5)
 ```
 
@@ -117,6 +139,7 @@ gap_gs <- gapminder %>%
 nlevels(gap_gs$country)
 levels(gap_gs$country)
 as.character(gap_gs$country)
+gap_gs
 ```
 
 
@@ -129,6 +152,7 @@ Here's the gapminder data down to rows where population is less than a quarter o
 ```{r}
 gap_small <- gapminder %>% 
   filter(pop < 250000)
+gap_small
 ```
 
 Exercise: Make a bar chart of the number of times a continent has a country with population < 250,000 in the `gapminder` data set. Try with and without `scale_x_discrete(drop=FALSE)`.
@@ -191,6 +215,9 @@ cont %>%
     fct_infreq() %>% 
     fct_rev() %>% 
     qplot()
+cont %>% 
+    fct_infreq() %>% 
+    qplot()
 ```
 
 Could also arrange by the order they appear in the factor with `fct_inorder()`.
@@ -212,7 +239,7 @@ ggplot(gap_asia_2007, aes(lifeExp, country)) + geom_point()
 
 Let's use `fct_reorder()` to reorder the countries of `gap_asia_2007` by life Expectancy, and produce the same plot:
 
-```{r, fig.width=4, fig.height=1.5}
+```{r, fig.width=5, fig.height=3.5}
 gap_asia_2007 %>% 
     mutate(country = fct_reorder(country, lifeExp)) %>% 
     ggplot(aes(lifeExp, country)) + 
@@ -234,9 +261,14 @@ Exercise: Try making the above box plot and violin plots, ordered by median life
 
 ```{r, fig.width=4, fig.height=1.5}
 gapminder %>% 
-    mutate(continent = fct_reorder(continent, lifeExp)) %>% 
+    mutate(continent = fct_reorder(continent, lifeExp, .fun = min)) %>% 
     ggplot(aes(continent, lifeExp)) +
     geom_boxplot()
+gapminder %>% 
+    mutate(continent = fct_reorder(continent, lifeExp, .fun = max)) %>% 
+    ggplot(aes(continent, lifeExp)) +
+    geom_boxplot()
+?fct_reorder
 ```
 
 
@@ -279,6 +311,11 @@ gap_asia_2007$country %>%
   fct_relevel("Syria", "Sweden", after=2) %>% 
   levels() %>% 
   head()
+
+gap_asia_2007$country %>% 
+  fct_relevel("Canada", "Cambodia", after=0) %>% 
+  levels() %>% 
+  head()
 ```
 
 ## Re-coding a Factor
@@ -291,6 +328,7 @@ Exercise: modify the following code to also change "Canada" to read "Can". Hint:
 gap_big_north <- gapminder %>% 
   filter(country %in% c("Canada", "United States", "Mexico")) %>% 
   droplevels()
+gap_big_north
 gap_big_north$country %>% 
   fct_recode("USA" = "United States") %>% 
   levels()
@@ -311,6 +349,10 @@ We can arbitrarily combine levels using `fct_collapse()`. For example, combine E
 cont %>% 
   fct_collapse("combo" = c("Europe", "Asia")) %>% 
   qplot()
+cont %>% 
+  fct_collapse("Eurasia" = c("Europe", "Asia")) %>% 
+  qplot()
+
 ```
 
 More practically, we can lump the least frequent levels together as "Other". Modify the above code to use `fct_lump()` instead of `fct_collapse()` so that:
@@ -333,7 +375,7 @@ Exercise: Modify the following violin plot of life expectancies of African count
 1. There are 4 "violins" corresponding to countries with the highest lifeExp.
 2. There are 4 "violins" corresponding to countries with the highest gdpPercap
 
-```{r, fig.width=2, fig.height=1}
+```{r, fig.width=10, fig.height=7}
 gap_africa <- gapminder %>% 
     filter(continent == "Africa")
 gap_africa %>% 
@@ -350,12 +392,26 @@ Use the `gss_cat` data to answer the following questions (from http://r4ds.had.c
 1. (15.3.1 Ex. 1) Explore the distribution of rincome (reported income). What makes the default bar chart hard to understand? How could you improve the plot?
 
 ```{r}
+library(ggplot2)
+forcats::gss_cat
+forcats::gss_cat
+gss_cat$race %>% 
+  levels()
+gss_cat$race
 
+gss_cat %>%
+  ggplot(aes(race)) +
+  geom_bar()
 ```
 
 2. (15.3.2 Ex. 2) What is the most common relig in this survey? What's the most common partyid?
 
 ```{r}
+gss_cat$relig %>% 
+  levels()
+gss_cat %>% 
+  ggplot(aes(relig)) +
+  geom_bar()
 
 ```
 
@@ -388,12 +444,13 @@ lubridate::ymd("2017-May-11")
 2. Get `year`, `month`, `yday`, `wday`, `day`.
 
 ```{r}
+lubridate::date()
 
 ```
 
 3. Add durations (exact time spans) with `ddays`, `dweeks`, ... and periods (human-interpretable time spans) with `days`, `weeks`, and especially `months`.
 
 ```{r}
-
+lubridate::ddays(5)
 ```
 
