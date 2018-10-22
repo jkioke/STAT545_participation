@@ -394,7 +394,7 @@ Use the `gss_cat` data to answer the following questions (from http://r4ds.had.c
 ```{r}
 library(ggplot2)
 forcats::gss_cat
-
+forcats::gss_cat
 gss_cat$race %>% 
   levels()
 gss_cat$race
